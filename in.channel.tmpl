@@ -1,0 +1,94 @@
+# 2d micelle simulation
+
+units		lj
+dimension	2
+
+timer timeout 12:00:00
+#########################################################
+# Variable Definition
+
+variable	globalT equal 40000000 
+variable    d1 equal 0.9 
+variable    d2 equal 0.9
+variable    d12 equal (${d1}+${d2})/2.0
+variable	bl equal 0.8
+variable    rc equal ${d1}*1.5
+variable    sig1 equal ${d1}/2^(1./6.)
+variable    sig2 equal ${d2}/2^(1./6.)
+variable    sig12 equal (${sig1}+${sig2})/2.0
+variable	timestep equal 0.001
+variable	kT equal 1.0
+variable	kspring equal 50000.0
+variable	acoeff equal 10000.0
+variable	mass equal 1.0
+variable	gamma equal 1.0
+variable	tau equal ${mass}/${gamma}
+
+#########################################################
+# selection of atom, bond, bend styles, etc.
+
+atom_style	angle
+
+#########################################################
+# specify boundary conditions and read data file
+
+boundary	p p p
+read_data	data.channel
+#read_restart out.rs
+
+group 		B type 2
+
+#########################################################
+# Adjust neighbor computations
+
+neighbor	0.3 bin
+neigh_modify	delay 10 
+
+
+#########################################################
+# Define bonded interactions
+
+bond_style 	harmonic
+bond_coeff 1 20000.0 ${bl}
+
+angle_style harmonic
+angle_coeff 1 ${acoeff} 180.0
+
+special_bonds lj/coul 0.0 0.0 0.0	
+
+
+#########################################################
+# Define pair-style interaction
+
+pair_style	hybrid/overlay lj/cut ${rc} bending ${rc}
+pair_coeff	1 1 lj/cut {{EPS}} ${sig1} ${d1}
+pair_coeff	1 2 lj/cut {{EPS}} ${sig12} ${d12}
+pair_coeff	2 2 lj/cut {{EPS}} ${sig2} ${rc}
+# bending kb kt cyl_r k_0 t_0
+pair_coeff	2 2 bending {{kappa_b}} {{kappa_t}} {{R}} {{b0}} {{t0}}
+
+
+#########################################################
+# Define time integration settings
+
+timestep	${timestep}
+fix		1 all nve
+fix		2 all langevin ${kT} ${kT} ${tau} {{seed}}
+fix		3 all enforce2d
+
+compute clid B cluster/atom 1.2 
+
+thermo		10000
+thermo_style    custom step spcpu etotal fnorm ndanger 
+
+#dump		1 B xyz 5000 dump.xyz
+dump		1 B xyz ${globalT} dump_f.xyz
+dump		2 all xyz ${globalT} dump_ff.xyz
+#dump		3 all xyz 50000 dump_a.xyz
+dump_modify	1 append yes
+dump        3 B custom 50000 clusters.xyz type x y c_clid
+
+# reset_timestep	0
+run		${globalT}
+
+write_restart	out.rs
