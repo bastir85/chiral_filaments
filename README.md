@@ -12,3 +12,6 @@ Steps to run simulations:
 1. Compile desired LAMMPS version
 1. Create input and data file with python3.6+ `python create.py`
 1. Run simualtion `$LAMMPS_BIN -in in.channel`
+
+
+[![DOI](https://zenodo.org/badge/281688627.svg)](https://zenodo.org/badge/latestdoi/281688627)
