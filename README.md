@@ -19,4 +19,8 @@ Smolokowski Integration
 
 The numerical integration of the smolokowski equation used in the paper is implemented in `smu.py`.
 
+Paper figures
+----
+All figures in the paper can be reproduced with the jupyter notebook in `plots`. Data files are uploaded using git lfs. In order to pull the data file please use `git-lfs pull` after cloning the repository. 
+
 [![DOI](https://zenodo.org/badge/281688627.svg)](https://zenodo.org/badge/latestdoi/281688627)
