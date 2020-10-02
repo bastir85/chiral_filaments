@@ -14,4 +14,9 @@ Steps to run simulations:
 1. Run simualtion `$LAMMPS_BIN -in in.channel`
 
 
+Smolokowski Integration
+----
+
+The numerical integration of the smolokowski equation used in the paper is implemented in `smu.py`.
+
 [![DOI](https://zenodo.org/badge/281688627.svg)](https://zenodo.org/badge/latestdoi/281688627)
